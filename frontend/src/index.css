@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .segment-block {
+    @apply p-4 rounded-lg mb-4 transition-all duration-200;
+  }
+  
+  .passage-block {
+    @apply bg-passage;
+  }
+  
+  .sentence-block {
+    @apply bg-sentence;
+  }
+  
+  .proposition-block {
+    @apply bg-proposition hover:bg-blue-200 cursor-pointer;
+  }
+} 
