@@ -4,6 +4,8 @@ import SegmentView from './components/SegmentView';
 
 function App() {
   const [text, setText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [segments, setSegments] = useState({
     passages: [],
     sentences: [],
@@ -12,27 +14,35 @@ function App() {
 
   const handleTextSubmit = async (inputText) => {
     setText(inputText);
+    setIsLoading(true);
+    setError(null);
     
-    // Split into passages (100-word chunks)
-    const words = inputText.split(/\s+/);
-    const passages = [];
-    for (let i = 0; i < words.length; i += 100) {
-      passages.push(words.slice(i, i + 100).join(' '));
-    }
-    
-    // Split into sentences
-    const sentences = inputText.match(/[^.!?]+[.!?]+/g) || [];
-    
-    // Get propositions from API
     try {
-      const response = await fetch('/api/propositions', {
+      // passages (100-word chunks)
+      const words = inputText.split(/\s+/);
+      const passages = [];
+      for (let i = 0; i < words.length; i += 100) {
+        passages.push(words.slice(i, i + 100).join(' '));
+      }
+      
+      // sentences
+      const sentences = inputText.match(/[^.!?]+[.!?]+/g) || [];
+      
+      // propositions 
+      const response = await fetch('http://127.0.0.1:8000/propositions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ text: inputText }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('API Response:', data); 
       
       setSegments({
         passages,
@@ -41,6 +51,9 @@ function App() {
       });
     } catch (error) {
       console.error('Error fetching propositions:', error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -51,9 +64,23 @@ function App() {
           Granularity Lens
         </h1>
         
-        <TextInput onSubmit={handleTextSubmit} />
+        <TextInput onSubmit={handleTextSubmit} disabled={isLoading} />
         
-        {text && (
+        {isLoading && (
+          <div className="text-center py-4">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+            <p className="mt-2 text-gray-600">Processing text...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+        
+        {text && !isLoading && !error && (
           <SegmentView
             text={text}
             segments={segments}
