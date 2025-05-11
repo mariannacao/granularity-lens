@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import TextInput from './components/TextInput';
 import SegmentView from './components/SegmentView';
 
+const loadingCats = [ 
+   "https://tenor.com/bkgBd.gif",
+   "https://tenor.com/td5Mu7SFNe5.gif",
+   "https://tenor.com/bsifJ.gif",
+   "https://tenor.com/oEw4o5oyOSc.gif",
+];
+
 function App() {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -11,6 +18,11 @@ function App() {
     sentences: [],
     propositions: []
   });
+
+  const getRandomCatGif = () => {
+    const randomIndex = Math.floor(Math.random() * loadingCats.length);
+    return loadingCats[randomIndex];
+  };
 
   const handleTextSubmit = async (inputText) => {
     setText(inputText);
@@ -78,12 +90,12 @@ function App() {
         {isLoading && (
           <div className="text-center py-8">
             <img 
-              src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" 
+              src={getRandomCatGif()}
               alt="Loading cat" 
               className="w-32 h-32 mx-auto mb-4"
             />
             <p className="text-lg font-medium text-gray-700">Processing your text...</p>
-            <p className="text-sm text-gray-500 mt-2">Our cat is analyzing your content</p>
+            <p className="text-sm text-gray-500 mt-2">Catto is thinking</p>
           </div>
         )}
 
