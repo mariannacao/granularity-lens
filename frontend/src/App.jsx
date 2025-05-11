@@ -1,33 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TextInput from './components/TextInput';
 import SegmentView from './components/SegmentView';
-
-const loadingCats = [ 
-   "https://tenor.com/bkgBd.gif",
-   "https://tenor.com/td5Mu7SFNe5.gif",
-   "https://tenor.com/bsifJ.gif",
-   "https://tenor.com/oEw4o5oyOSc.gif",
-];
+import { TENOR_API_KEY, TENOR_CLIENT_KEY } from './config';
 
 function App() {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [loadingGif, setLoadingGif] = useState('');
   const [segments, setSegments] = useState({
     passages: [],
     sentences: [],
     propositions: []
   });
 
-  const getRandomCatGif = () => {
-    const randomIndex = Math.floor(Math.random() * loadingCats.length);
-    return loadingCats[randomIndex];
+  const fetchRandomCatGif = async () => {
+    try {
+      const response = await fetch(
+        `https://tenor.googleapis.com/v2/search?q=loading%20cat&key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=50`
+      );
+      const data = await response.json();
+      if (data.results && data.results.length > 0) {
+        const randomIndex = Math.floor(Math.random() * data.results.length);
+        setLoadingGif(data.results[randomIndex].media_formats.gif.url);
+      }
+    } catch (error) {
+      console.error('Error fetching cat GIF:', error);
+      setLoadingGif('https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif');
+    }
   };
+
+  useEffect(() => {
+    fetchRandomCatGif();
+  }, []);
 
   const handleTextSubmit = async (inputText) => {
     setText(inputText);
     setIsLoading(true);
     setError(null);
+    
+    fetchRandomCatGif();
     
     try {
       // passages (100-word chunks)
@@ -90,7 +102,7 @@ function App() {
         {isLoading && (
           <div className="text-center py-8">
             <img 
-              src={getRandomCatGif()}
+              src={loadingGif}
               alt="Loading cat" 
               className="w-32 h-32 mx-auto mb-4"
             />
