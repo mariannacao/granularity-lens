@@ -29,20 +29,29 @@ function App() {
       const sentences = inputText.match(/[^.!?]+[.!?]+/g) || [];
       
       // propositions 
+      console.log('making API request to:', 'http://127.0.0.1:8000/propositions');
+      console.log('request payload:', { text: inputText });
+      
       const response = await fetch('http://127.0.0.1:8000/propositions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({ text: inputText }),
       });
 
+      console.log('response status:', response.status);
+      console.log('response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
       
       const data = await response.json();
-      console.log('API Response:', data); 
+      console.log('API response:', data); 
       
       setSegments({
         passages,
@@ -50,7 +59,7 @@ function App() {
         propositions: data.propositions
       });
     } catch (error) {
-      console.error('Error fetching propositions:', error);
+      console.error('error fetching propositions:', error);
       setError(error.message);
     } finally {
       setIsLoading(false);
