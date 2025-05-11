@@ -39,4 +39,13 @@ coverage/
 .idea/
 .vscode/
 *.swp
-*.swo 
+*.swo
+
+# Environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Project specific
+frontend/src/config.js 
