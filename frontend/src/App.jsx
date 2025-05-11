@@ -76,9 +76,14 @@ function App() {
         <TextInput onSubmit={handleTextSubmit} disabled={isLoading} />
         
         {isLoading && (
-          <div className="text-center py-4">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-            <p className="mt-2 text-gray-600">Processing text...</p>
+          <div className="text-center py-8">
+            <img 
+              src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" 
+              alt="Loading cat" 
+              className="w-32 h-32 mx-auto mb-4"
+            />
+            <p className="text-lg font-medium text-gray-700">Processing your text...</p>
+            <p className="text-sm text-gray-500 mt-2">Our cat is analyzing your content</p>
           </div>
         )}
 

@@ -1,21 +1,10 @@
 import React, { useState } from 'react';
-import { Group } from '@visx/group';
-import { scaleLinear } from '@visx/scale';
 
 function SegmentView({ text, segments }) {
   const [hoveredProposition, setHoveredProposition] = useState(null);
   const [showPassages, setShowPassages] = useState(true);
   const [showSentences, setShowSentences] = useState(true);
   const [showPropositions, setShowPropositions] = useState(true);
-
-  const width = 800;
-  const height = 400;
-  const padding = 40;
-
-  const xScale = scaleLinear({
-    domain: [0, segments.propositions.length - 1],
-    range: [padding, width - padding],
-  });
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
@@ -49,77 +38,66 @@ function SegmentView({ text, segments }) {
         </label>
       </div>
 
-      <div className="relative">
-        <svg width={width} height={height}>
-          <Group>
-            {showPassages && segments.passages.map((passage, i) => (
-              <g key={`passage-${i}`}>
-                <rect
-                  x={padding}
-                  y={i * 60 + 20}
-                  width={width - 2 * padding}
-                  height={40}
-                  className="passage-block"
-                  rx={4}
-                />
-                <text
-                  x={padding + 10}
-                  y={i * 60 + 45}
-                  className="text-sm text-gray-600"
-                >
-                  Passage {i + 1}
-                </text>
-              </g>
-            ))}
+      <div className="space-y-6">
+        {/* Original Text */}
+        <div className="border rounded-lg p-4 bg-gray-50">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Original Text</h3>
+          <p className="text-gray-700 whitespace-pre-wrap">{text}</p>
+        </div>
 
-            {showSentences && segments.sentences.map((sentence, i) => (
-              <g key={`sentence-${i}`}>
-                <rect
-                  x={padding + 20}
-                  y={i * 40 + 30}
-                  width={width - 2 * padding - 40}
-                  height={30}
-                  className="sentence-block"
-                  rx={4}
-                />
-                <text
-                  x={padding + 30}
-                  y={i * 40 + 50}
-                  className="text-sm text-gray-600"
-                >
-                  Sentence {i + 1}
-                </text>
-              </g>
-            ))}
+        {/* Passages */}
+        {showPassages && (
+          <div className="border rounded-lg p-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Passages</h3>
+            <div className="space-y-4">
+              {segments.passages.map((passage, i) => (
+                <div key={`passage-${i}`} className="bg-blue-50 p-3 rounded">
+                  <span className="text-sm font-medium text-blue-700">Passage {i + 1}:</span>
+                  <p className="mt-1 text-gray-700">{passage}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-            {showPropositions && segments.propositions.map((proposition, i) => (
-              <g
-                key={`proposition-${i}`}
-                onMouseEnter={() => setHoveredProposition(proposition)}
-                onMouseLeave={() => setHoveredProposition(null)}
-              >
-                <rect
-                  x={xScale(i)}
-                  y={height - 60}
-                  width={100}
-                  height={30}
-                  className="proposition-block"
-                  rx={4}
-                />
-                <text
-                  x={xScale(i) + 5}
-                  y={height - 40}
-                  className="text-xs text-gray-600"
-                >
-                  Prop {i + 1}
-                </text>
-              </g>
-            ))}
-          </Group>
-        </svg>
+        {/* Sentences */}
+        {showSentences && (
+          <div className="border rounded-lg p-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Sentences</h3>
+            <div className="space-y-3">
+              {segments.sentences.map((sentence, i) => (
+                <div key={`sentence-${i}`} className="bg-green-50 p-3 rounded">
+                  <span className="text-sm font-medium text-green-700">Sentence {i + 1}:</span>
+                  <p className="mt-1 text-gray-700">{sentence.trim()}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
+        {/* Propositions */}
+        {showPropositions && (
+          <div className="border rounded-lg p-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Propositions</h3>
+            <div className="space-y-3">
+              {segments.propositions.map((proposition, i) => (
+                <div
+                  key={`proposition-${i}`}
+                  className="bg-purple-50 p-3 rounded cursor-pointer hover:bg-purple-100 transition-colors"
+                  onMouseEnter={() => setHoveredProposition(proposition)}
+                  onMouseLeave={() => setHoveredProposition(null)}
+                >
+                  <span className="text-sm font-medium text-purple-700">Proposition {i + 1}:</span>
+                  <p className="mt-1 text-gray-700">{proposition}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Proposition Details Tooltip */}
         {hoveredProposition && (
-          <div className="absolute top-0 right-0 bg-white p-4 rounded-lg shadow-lg max-w-md">
+          <div className="fixed top-4 right-4 bg-white p-4 rounded-lg shadow-lg max-w-md border">
             <h3 className="font-medium text-gray-900 mb-2">Proposition Details</h3>
             <p className="text-sm text-gray-600">{hoveredProposition}</p>
           </div>
